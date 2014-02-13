@@ -13,3 +13,7 @@ File Name | Type | Category | Comments | Script for webscraping |
 [General Discussions from UAE Expat] (https://github.com/noobuseR/Datasets/blob/master/UAEexpatForum.txt) | Txt | Dataset | A semi-cleaned dataset pertaining to discussions in the Expat forum for the UAE (no stemming applied) | [Available] (https://raw2.github.com/noobuseR/Datasets/master/Code-UAEexpatForum.txt)
 [Trip discussions from TravelAdvisor for UAE] (https://github.com/noobuseR/Datasets/blob/master/UAEtripAdvisor.txt) | Txt | Dataset | A semi-cleaned dataset pertaining to discussions in the TripAdvisor website for the UAE (no stemming applied) | [Available] (https://raw2.github.com/noobuseR/Datasets/master/Code-UAEtripAdvisor.txt)
 [Middle East Politics' Discussion] (https://github.com/noobuseR/Datasets/blob/master/middleEastPolitics.txt) | Txt | Dataset | A semi-cleaned dataset pertaining to Middle Eastern politics' discussion (no stemming applied) | [Available] (https://raw2.github.com/noobuseR/Datasets/master/Code-middleEastPolitics.txt)
+
+
+
+##...More coming soon!
