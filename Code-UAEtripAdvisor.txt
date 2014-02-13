@@ -1,0 +1,84 @@
+##================================== To scrape data from UAE TripAdvisor ==================================
+
+#Dataset Source: http://www.tripadvisor.co.uk/
+#Software used for web scraping: R
+#Programmer: Ali Arsalan Kazmi
+
+
+##===================================== Formulate target URLs for TripAdvisor Dubai
+
+
+baseUrl<- "http://www.tripadvisor.co.uk/"
+extra<- "ShowForum-g295424-i872-"
+pageNumber<- paste0("o",seq(from=20,to=200,by=20))
+end<- "-Dubai_Emirate_of_Dubai.html"
+
+firstUrl<- "http://www.tripadvisor.co.uk/ShowForum-g295424-i872-Dubai_Emirate_of_Dubai.html"
+completeUrl<- c(firstUrl,paste0(baseUrl,extra,pageNumber,end))
+
+
+
+##===================================== Scrap web links from Trip Advisor UAE
+
+
+webLinks<- unlist(lapply(completeUrl,function(x)getHTMLLinks(x)))
+#select only those links pertaining to discussions
+usefulLinks<- grepl("^/ShowTopic-",webLinks)
+discussionLinks<- webLinks[usefulLinks]
+#remove links that refer to 'last posts'
+lastPosts<- grepl("[[:digit:]]+$",discussionLinks)
+discussionLinks<- discussionLinks[which(lastPosts==FALSE)]
+
+#combine extracted links with the base url
+discussionLinks<- substr(discussionLinks,2,nchar(discussionLinks))
+finalLinks<- paste0(baseUrl,discussionLinks)
+
+
+
+
+##===================================== Scrap discussion threads for discussions
+
+
+discussions<- sapply(finalLinks,function(x)htmlParse(x))
+discussionContents<- unlist(lapply(discussions,function(x)getNodeSet(x,"//div[@class='postBody']")))
+posts<- unlist(lapply(discussionContents,function(x)xmlValue(x)))
+posts<- gsub("\t|\n|\r"," ",posts)
+#remove any hyperlinks
+postsClean<- gsub("[[:graph:]]+\\.(com|co|ae|org|gov)[[:graph:]]*[.htm]*"," ",posts)
+#remove email addresses
+postsClean<- gsub("[[:graph:]]+@[[:graph:]]+\\.(com|co|ae|org|gov)"," ",postsClean)
+#remove numbers
+postsClean<- gsub("[[:digit:]]"," ",postsClean)
+#change letters to lowercase
+postsClean<- tolower(postsClean)
+#remove stopwords
+myStopwords<- c(stopwords("english"),stopwords("SMART"),"just","am","pm","about","around","out","tripadvisor","thanks","thank you","need","very","only","could","other","going","more","emirates","post","think","days","should","area","city","posting","anyone","thank","hour","hours","most","were","room","because","remove","right","last","hi","both","please","next","info","better","travel","make","few","nice","staying","too","does","same","trip","being","per","minutes","minute","over","always","here","say","between","close","even","forum","now","posts","still","again","edited","edit","year","its","end","got","above","stayed","getting","off","did","link","either","links","times","able","during","having","message","that's","lots","never","th","anything","ask","review","reviews","something","another","each","give","board","different","things","thing","those","can't","etc","here","add","anybody","ibn","perhaps","reply","comment","comments","cheers","dhs","aed","answer","answers","it's")
+myStopwords<- gsub("^","\\\\b",myStopwords)
+myStopwords<- gsub("$","\\\\b",myStopwords)
+x<- mapply(FUN=function(...){
+postsClean<<- gsub(...,replacement=" ",x=postsClean)},
+pattern=myStopwords)
+#use thesauri
+initialWords<- c("festivals","hotels","beaches","visas","taxis","cabs","cab","buses","guidelines","booked","book","pay","paying","services","tours","places","recommended","dirhams","clubs","restaurants","vouchers","couples","forums","budgets","bur dubai","nights","parks","tickets","drinks","prices","apartments","cars","costs","cruises","jumeriah","jumeira","waiting","waited","adults","children","bars","abu dhabi","wine","customer","drivers","shops","airlines","suggestions","departing","depart","discounts","complaints","arrivals","transfers","terms","singles","rains","residences","dxb","sharja","activities","services","offers","location","cafes","problems","pictures","photos","residences","risks","safaris","shows","souqs","streets","terminals","adventures","airline","airport","areas","asians","attractions","charges","cinemas","dubai's","facilities","industrial area","animals","applications","supermarkets","souks","souk","schools","ramadan","mosques","movies","lands","layovers","transits","govt","gov","fujeirah","fridays","foods","facilities","fees","doctors","dunes","clothing","prebook","properties","passengers","packages","malls","hotels","jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","advertisements","advertising","advertised","burj al arab","burj khalifa","burj khalifah","members")
+finalWords<- c("festival","hotel","beach","visa","taxi","taxi","taxi","bus","guideline","booking","booking","payment","payment","service","tour","place","recommend","dirham","club","restaurant","voucher","couple","forum","budget","burDubai","night","park","ticket","drink","price","apartment","car","cost","cruise","jumeirah","jumeriah","wait","wait","adult","child","bar","abuDhabi","alcohol","customer","driver","shopping","airline","suggestion","departure","departure","discount","complaint","arrival","trasnfer","term","single","rain","residence","dubai","sharjah","activity","service","offer","location","cafe","problem","picture","photo","residence","risk","safari","show","souq","street","terminal","adventure","airline","airport","area","asian","attraction","charge","cinema","dubai","facility","industrialArea","animal","application","supermarket","souq","souq","school","ramadhan","mosque","movie","land","layover","transit","government","government","fujairah","friday","food","facility","fee","dune","doctor","clothes","booking","property","passenger","package","mall","hotel","january","february","march","april","may","june","july","august","september","october","november","december","ad","ad","ad","burjAlArab","burjKhalifa","burjKhalifa","member")
+#modify the thesauri so that only whole words in the corpus are identified and changed
+initialWords<- gsub("^","\\\\b",initialWords)
+initialWords<- gsub("$","\\\\b",initialWords)
+#apply thesauri to our corpus
+x<- mapply(FUN=function(...){
+postsClean<<- gsub(...,x=postsClean)},
+pattern=initialWords,replacement=finalWords)
+#remove punctuation
+postsClean<- gsub("[[:punct:]…]"," ",postsClean)
+#remove whitespace
+postsClean<- stripWhitespace(postsClean)
+postsClean<- gsub("^\\s","",postsClean)
+postsClean<- gsub("\\s$","",postsClean)
+#remove posts with low information value
+finalPosts<- postsClean[sapply(postsClean,function(x)nchar(x))>10]
+
+
+write(finalPosts,file="UAEtripAdvisor.txt",sep="\n")
+
+
+############################## Done! 1246 Posts included in our dataset! #####################################

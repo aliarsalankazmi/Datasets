@@ -1,0 +1,107 @@
+##================================== To scrape data from Political Forum ==================================
+
+#Dataset Source: http://www.politicalforum.com/forumdisplay.php?f=24
+#Software used for web scraping: R
+#Programmer: Ali Arsalan Kazmi
+
+
+##===================================== Formulate target URLs for Political Forum for Middle East
+
+
+baseUrl<- "http://www.politicalforum.com/forumdisplay.php?f=24"
+pageNumber<- paste0("&page=",seq(from=1,to=7))
+completeUrl<- paste0(baseUrl,pageNumber)
+
+
+
+
+##===================================== Scrap web links for discussion threads from Middle East politics forum
+
+
+webLinks<- unlist(lapply(completeUrl,function(x)getHTMLLinks(x)))
+#identify and extract only those links pertaining to discussions (threads)
+usefulLinks<- grepl("showthread\\.php",webLinks)
+discussionLinks<- webLinks[usefulLinks]
+
+#combine extracted urls with the base url
+baseUrl<- "http://www.politicalforum.com/"
+finalLinks<- paste0(baseUrl,discussionLinks)
+#trim links
+finalLinks<- gsub("&s=[[:graph:]]+","",finalLinks)
+#remove duplicate urls
+finalLinks<- unique(finalLinks)
+
+
+
+##===================================== Scrap discussion threads for discussions
+
+
+discussions<- sapply(finalLinks,function(x)htmlParse(x))
+discussionsContents<- unlist(lapply(discussions,function(x)getNodeSet(x,"//div[starts-with(@id,'post_message')]")))
+posts<- unlist(lapply(discussionsContents,function(x)xmlValue(x)))
+posts<- gsub("\t|\r|\n"," ",posts)
+#remove one type of urls
+postsClean<- gsub("http://[[:graph:]]+\\.(com|org|gov|co|ac)[[:graph:]]*[.htm]*"," ",posts)
+#remove another type
+postsClean<- gsub("www\\.[[:graph:]]+\\s"," ",postsClean)
+#remove phrases not part of discussions
+postsClean<- gsub("\\s*Originally\\sPosted\\sby\\s[[:alnum:]]*(\\s|[[:punct:]])"," ",postsClean)
+#remove numbers
+postsClean<- gsub("[[:digit:]]+"," ",postsClean)
+#change letters to lowercase
+postsClean<- tolower(postsClean)
+#remove any quotes
+postsClean<- gsub("\""," ",postsClean)
+#remove numbers
+postsClean<- gsub("[[:digit:]]","",postsClean)
+#remove unnecessary characters
+postsClean<- gsub("[â€œã¥€™“%&@#$=~*”’`‘^_¡—¦]"," ",postsClean)
+#remove unnecessary punctuation
+postsClean<- gsub("[.,;:?!/)(¦]"," ",postsClean)
+#remove non-hyphen, non-apostrophe characters; credits to sln http://stackoverflow.com/questions/4784019/regex-character-class-subtraction-with-php/4786560#4786560 and J. Ulrich http://stackoverflow.com/questions/13372438/regex-eliminate-all-punctuation-except
+#posibble attempt 1: postsClean<- gsub("(?=[^'[:^punct:]])","",postsClean,perl=TRUE)
+#possible attempt 2: postsClean<- gsub("[^[:alnum:][:space:]']","",postsClean)
+#possible attemtp 3: postsClean<- gsub("[^[:^punct:]'-]","",postsClean)
+#NOTE: the above not used as require further time to be grasped/experimented with
+#remove stopwords
+Stopwords<- c(stopwords("english"),stopwords("SMART"))
+Stopwords<- gsub("^","\\\\b",Stopwords)
+Stopwords<- gsub("$","\\\\b",Stopwords)
+x<- mapply(FUN=function(...){
+postsClean<<- gsub(...,replacement=" ",x=postsClean)},
+pattern=Stopwords)
+postsClean<- gsub("-"," ",postsClean)
+postsClean<- stripWhitespace(postsClean)
+postsClean<- gsub("^\\s","",postsClean)
+postsClean<- gsub("\\s$","",postsClean)
+#formulate thesauri
+initialWords<- c("allah","israeli","israelis","israelites","jews","jew","arabs","palestinians","palestinian","west bank","east bank","muslims","egyptians","egyptian","zionists","governments","al quran","qur'an","syrians","middle east","political","child","settlements","laws","nuclear power","americans","saudi arabia","religions","settlements","evidences","settler","christians","europeans","millions","syrians","syrian","solutions","attacks","iranians","iranian","ministers","groups","families","regions","nazis","attacks","terrorists","terrorist","sanctions","leaders","officials","civilians","crimes","societies","descendants","interests","murdered","criticism","votes","authorities","fights","families","sides","rockets","soldiers","rebel","ottomans","tel aviv","troops")
+finalWords<- c("god","israel","israeli","israeli","jewish","jewish","arab","palestinian","palestine","westBank","eastBank","muslim","egyptian","egypt","zionist","government","quran","quran","syrian","middleEast","politics","chidren","settlement","law","nuclearPower","american","saudiArabia","religion","settlement","evidence","settlers","christian","european","million","syrian","syria","solution","attack","iranian","iran","minister","group","family","region","nazi","attack","terrorist","terrosim","sanction","leader","official","civilian","crime","society","descendant","interest","murder","criticise","vote","authority","fight","family","side","rocket","soldier","rebels","ottoman","telAviv","troop")
+#modify thesauri so that only whole words are identified and changed in our corpus
+initialWords<- gsub("^","\\\\b",initialWords)
+initialWords<- gsub("$","\\\\b",initialWords)
+x<- mapply(FUN=function(...){
+postsClean<<- gsub(...,x=postsClean)},
+pattern=initialWords,replacement=finalWords)
+#formulate stopwords
+myStopwords<- c("january","jan","february","feb","march","mar","april","apr","may","june","jun","july","jul","august","aug","september","sep","october","oct","november","nov","december","dec","people","state","world","time","al","fact","part","called","countries","made","today","nation","nations","points","point","give","article","dont","long","year","place","thing","find","thread","threads","told","post","posts","posted","ago","including","wrote","past","area","humans","human","word","ve","put","case","book","things","times","story","order","continue","man","modern","lot","return","found","matter","number","side","large","period","full","words","forum","peoples","based","days","comment","created","kind","due","fact","facts","men","making","means","person","brought","high","set","pro","pre","gave","happened","lived","face","faced","makes","numbers","news","topic","small","dred","guess","led","inside","earlier","ben","ibn","bin","ways","way","messages","message","millions","million","longer","mind","members","ing")
+#modify stopwords so that only whole words are identified from the corpus and changed
+myStopwords<- gsub("^","\\\\b",myStopwords)
+myStopwords<- gsub("$","\\\\b",myStopwords)
+x<- mapply(FUN=function(...){
+postsClean<<- gsub(...,replacement=" ",x=postsClean)},
+pattern=myStopwords)
+#remove punctuation
+postsClean<- gsub("[[:punct:]]"," ",postsClean)
+#remove blank spaces again!
+postsClean<- stripWhitespace(postsClean)
+postsClean<- gsub("^\\s","",postsClean)
+postsClean<- gsub("\\s$","",postsClean)
+#remove posts with low information value
+finalPosts<- postsClean[sapply(postsClean,function(x)nchar(x))>10]
+
+
+write(finalPosts,file="middleEastPolitics.txt",sep="\n")
+
+
+############################## Done! 2230 Posts included in our dataset! #####################################

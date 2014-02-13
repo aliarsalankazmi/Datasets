@@ -1,0 +1,83 @@
+##================================== To scrape data from UAE Expat Forum discussion board =========================
+
+#Dataset Source: http://www.expatforum.com/expats/uae-expat-forum-expats-living-uae/
+#Software used for web scraping: R
+#Programmer: Ali Arsalan Kazmi
+
+
+##===================================== Load required library
+
+require(XML)
+require(tm)
+
+
+##===================================== Formulate target URLs for UAE Expat Forum discussion board
+
+
+baseUrl<- "http://www.expatforum.com/expats/uae-expat-forum-expats-living-uae/"
+completeUrl<- paste0(baseUrl,"index",seq(from=1,to=10),".html")
+
+
+
+
+##===================================== Scrap web links for discussion threads from the UAE Expats Forum
+
+webLinks<- unlist(lapply(completeUrl,function(x)getHTMLLinks(x)))
+#select only those links pertaining to discussions
+usefulLinks<- grepl("expats/uae-expat-forum-expats-living-uae/[[:digit:]]{4,}.+",webLinks)
+discussionLinks<- webLinks[usefulLinks]
+#remove links to 'last post'
+lastpostLinks<- grepl("#post[[:digit:]]+$",discussionLinks)
+discussionLinks<- discussionLinks[which(lastpostLinks==FALSE)]
+#select only unique links
+discussionLinks<- unique(discussionLinks)
+
+
+##===================================== Scrap discussion threads for discussions
+
+discussion<- sapply(discussionLinks,function(x)htmlParse(x))
+#the following line of code was provided by unutbu on stackoverflow
+#http://stackoverflow.com/questions/21644828/using-xpath-in-xml-to-scrap-nodes-with-varying-values
+#credits to him!
+discussionContents<- unlist(lapply(discussion,function(x)getNodeSet(x,"//div[starts-with(@id,'post_message')]")))
+posts<- unlist(lapply(discussionContents,function(x)xmlValue(x)))
+#remove unnecessary parts of a post
+postsClean<- gsub("\r|\n|\t"," ",posts)
+postsClean<- gsub("Originally Posted by ","OriginallyPostedBy",postsClean)
+#postsClean<- gsub("Originally.*?\\b"," ",postsClean)
+postsClean<- gsub("Originally[[:alnum:]]*\\b"," ",postsClean)
+postsClean<- removeNumbers(postsClean)
+postsClean<- tolower(postsClean)
+#remove strange characters
+postsClean<- gsub("â|€|“|â€|™","",postsClean)
+#now, we may remove any stopwords present in the dataset
+myStopwords<- c(stopwords("english"),stopwords("SMART"),"uae","edited","posted","salam","salaam","salaams","wasalam","bro","reply","january","february","march","april","may","june","july","august","september","october","november","december","jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","pm","am","ae","topic","topics","tonnes","tons","things","thing","quote","quoted","people","non","none","guyz","forums","forum","folk","folks","days","day","comments","comment","thanks","thank","ve")
+myStopwords<- gsub("^","\\\\b",myStopwords)
+myStopwords<- gsub("$","\\\\b",myStopwords)
+x<- mapply(FUN=function(...){
+postsClean<<- gsub(...,replacement=" ",x=postsClean)},
+pattern=myStopwords)
+#formulate thesauri
+initialWords<- c("abu dhabi","abaya","accommodations","accomodation","accomodation","activities","advertisement","advertisments","zones","women","weekends","websites","visas","traveling","traveled","travelling","training","trained","tourists","tickets","teens","teen","teenagers","teams","taxis","taxies","students","sponsors","sponsorship","sports","solicitors","skills","singles","shops","shopping","sheik","shariah","secure","searched","searching","schools","schooling","savings","salaries","houses","house","runs","roads","responses","researched","recruiters","recommendations","questions","properties","professions","professionals","problems","professions","pools","policies","places","phones","penalties","patients","passports","pakistanis","packages","options","opportunities","offices","newspapers","natives","muslims","luv","luved","locations","licences","licenses","legally","lawyers","laws","landlords","labor","kitchens","jams","iphones","interviews","interviewed","interviewing","insure","infest","indians","imports","immigrants","husbands","hubby","homes","highways","guys","graduates","govt","gov","girls","gardens","fujaira","friends","flights","floors","flats","filipinos","families","festivals","females","expenses","expired","expires","experiences","experienced","expats","examination","examinations","exams","evenings","europeans","events","engineers","engineering","emiratis","electronics","electricians","driving","drivers","discussions","developers","deposits","dates","cultures","crickets","courses","countries","couples","contracts","compounds","companies","colleges","cities","children","cheaper","certificates","careers","cars","candidates","cancelled","cancellation","campuses","cabs","buildings","boys","blocks","blocked","bedrooms","beaches","balconies","jobs","teachers","buses")
+finalWords<- c("abudhabi","abayas","accommodation","accommodation","accommodation","activity","ad","ads","zone","woman","weekend","website","visa","travel","travel","travel","train","train","tourist","ticket","teenager","teenager","teenager","team","taxi","taxi","student","sponsor","sponsor","sport","solicitor","skill","single","shop","shop","sheikh","sharia","security","search","search","school","school","saving","salary","housing","housing","run","road","response","research","recruiter","recommendation","question","property","profession","professional","problem","profession","pool","policy","place","phone","penalty","patient","passport","pakistani","package","option","opportunity","office","news","native","muslim","love","love","location","licence","licence","legal","lawyer","law","landlord","labour","kitchen","jam","iphone","interview","interview","interview","insurance","infestation","indian","import","immigrant","husband","husband","home","highgway","guy","graduate","government","governement","girl","garden","fujairah","friend","flight","floor","flat","filipino","family","festival","female","expense","expire","expire","experience","experience","expat","exam","exam","exam","evening","european","event","engineer","engineer","emirati","electronic","electrician","drive","driver","discussion","developer","deposit","date","culture","cricket","course","country","couple","contract","compound","company","college","city","child","cheap","certificate","career","car","candidate","cancel","cancel","campus","taxi","building","boy","block","block","bedroom","beach","balcony","job","teacher","bus")
+#modify thesauri so that whole words are identified and changed by gsub
+initialWords<- gsub("^","\\\\b",initialWords)
+initialWords<- gsub("$","\\\\b",initialWords)
+#use thesauri
+x<- mapply(FUN=function(...){
+postsClean<<- gsub(...,x=postsClean)},
+pattern=initialWords,replacement=finalWords)
+#remove punctuation
+postsClean<- gsub("[[:punct:]]"," ",postsClean)
+#remove whitespace
+postsClean<- stripWhitespace(postsClean)
+postsClean<- gsub("^\\s","",postsClean)
+postsClean<- gsub("\\s$","",postsClean)
+#remove posts with low information value
+finalPosts<- postsClean[sapply(postsClean,function(x)nchar(x))>10]
+
+write(finalPosts,file="UAEexpatForum.txt",sep="\n")
+
+
+
+############################## Done! 1516 Posts included in our dataset! #####################################
