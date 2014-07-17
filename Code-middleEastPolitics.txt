@@ -54,10 +54,12 @@ postsClean<- tolower(postsClean)
 postsClean<- gsub("\""," ",postsClean)
 #remove numbers
 postsClean<- gsub("[[:digit:]]","",postsClean)
+
 #remove unnecessary characters
-postsClean<- gsub("[â€œã¥€™“%&@#$=~*”’`‘^_¡—¦]"," ",postsClean)
+#postsClean<- gsub("[â€œã¥€ï¿½ï¿½%&@#$=~*ï¿½ï¿½`ï¿½^_ï¿½ï¿½ï¿½]"," ",postsClean)
+
 #remove unnecessary punctuation
-postsClean<- gsub("[.,;:?!/)(¦]"," ",postsClean)
+postsClean<- gsub("[.,;:?!/)(ï¿½]"," ",postsClean)
 #remove non-hyphen, non-apostrophe characters; credits to sln http://stackoverflow.com/questions/4784019/regex-character-class-subtraction-with-php/4786560#4786560 and J. Ulrich http://stackoverflow.com/questions/13372438/regex-eliminate-all-punctuation-except
 #posibble attempt 1: postsClean<- gsub("(?=[^'[:^punct:]])","",postsClean,perl=TRUE)
 #possible attempt 2: postsClean<- gsub("[^[:alnum:][:space:]']","",postsClean)
