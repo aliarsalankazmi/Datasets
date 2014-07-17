@@ -68,8 +68,10 @@ initialWords<- gsub("$","\\\\b",initialWords)
 x<- mapply(FUN=function(...){
 postsClean<<- gsub(...,x=postsClean)},
 pattern=initialWords,replacement=finalWords)
+
 #remove punctuation
-postsClean<- gsub("[[:punct:]…]"," ",postsClean)
+#postsClean<- gsub("[[:punct:]ï¿½]"," ",postsClean)
+
 #remove whitespace
 postsClean<- stripWhitespace(postsClean)
 postsClean<- gsub("^\\s","",postsClean)
