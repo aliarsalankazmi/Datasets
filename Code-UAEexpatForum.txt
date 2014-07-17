@@ -33,12 +33,14 @@ discussionLinks<- discussionLinks[which(lastpostLinks==FALSE)]
 discussionLinks<- unique(discussionLinks)
 
 
-##===================================== Scrap discussion threads for discussions
+##===================================== Scrap discussion threads for discussions' data
 
 discussion<- sapply(discussionLinks,function(x)htmlParse(x))
+
 #the following line of code was provided by unutbu on stackoverflow
 #http://stackoverflow.com/questions/21644828/using-xpath-in-xml-to-scrap-nodes-with-varying-values
 #credits to him!
+
 discussionContents<- unlist(lapply(discussion,function(x)getNodeSet(x,"//div[starts-with(@id,'post_message')]")))
 posts<- unlist(lapply(discussionContents,function(x)xmlValue(x)))
 #remove unnecessary parts of a post
@@ -48,8 +50,10 @@ postsClean<- gsub("Originally Posted by ","OriginallyPostedBy",postsClean)
 postsClean<- gsub("Originally[[:alnum:]]*\\b"," ",postsClean)
 postsClean<- removeNumbers(postsClean)
 postsClean<- tolower(postsClean)
+
 #remove strange characters
-postsClean<- gsub("â|€|“|â€|™","",postsClean)
+#postsClean<- gsub("ï¿½|ï¿½|ï¿½|ï¿½ï¿½|ï¿½","",postsClean)
+
 #now, we may remove any stopwords present in the dataset
 myStopwords<- c(stopwords("english"),stopwords("SMART"),"uae","edited","posted","salam","salaam","salaams","wasalam","bro","reply","january","february","march","april","may","june","july","august","september","october","november","december","jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","pm","am","ae","topic","topics","tonnes","tons","things","thing","quote","quoted","people","non","none","guyz","forums","forum","folk","folks","days","day","comments","comment","thanks","thank","ve")
 myStopwords<- gsub("^","\\\\b",myStopwords)
