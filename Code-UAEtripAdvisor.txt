@@ -70,7 +70,7 @@ postsClean<<- gsub(...,x=postsClean)},
 pattern=initialWords,replacement=finalWords)
 
 #remove punctuation
-#postsClean<- gsub("[[:punct:]�]"," ",postsClean)
+#postsClean<- gsub("[^a-zA-Z0-9]"," ",postsClean)
 
 #remove whitespace
 postsClean<- stripWhitespace(postsClean)
