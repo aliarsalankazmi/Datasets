@@ -9,7 +9,7 @@
 
 
 baseUrl<- "http://www.politicalforum.com/forumdisplay.php?f=24"
-pageNumber<- paste0("&page=",seq(from=1,to=7))
+pageNumber<- paste0("&page=",seq(from=1,to=9))
 completeUrl<- paste0(baseUrl,pageNumber)
 
 
