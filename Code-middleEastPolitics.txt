@@ -56,7 +56,7 @@ postsClean<- gsub("\""," ",postsClean)
 postsClean<- gsub("[[:digit:]]","",postsClean)
 
 #remove unnecessary characters
-#postsClean<- gsub("[“㥀��%&@#$=~*��`�^_���]"," ",postsClean)
+#postsClean<- gsub("[^a-zA-Z0-9]"," ",postsClean)
 
 #remove unnecessary punctuation
 postsClean<- gsub("[.,;:?!/)(�]"," ",postsClean)
