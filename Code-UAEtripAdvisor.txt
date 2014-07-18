@@ -10,7 +10,7 @@
 
 baseUrl<- "http://www.tripadvisor.co.uk/"
 extra<- "ShowForum-g295424-i872-"
-pageNumber<- paste0("o",seq(from=20,to=200,by=20))
+pageNumber<- paste0("o",seq(from=20,to=220,by=20))
 end<- "-Dubai_Emirate_of_Dubai.html"
 
 firstUrl<- "http://www.tripadvisor.co.uk/ShowForum-g295424-i872-Dubai_Emirate_of_Dubai.html"
@@ -79,8 +79,10 @@ postsClean<- gsub("\\s$","",postsClean)
 #remove posts with low information value
 finalPosts<- postsClean[sapply(postsClean,function(x)nchar(x))>10]
 
+#Change encoding to enable reading into shinyapp
+Encoding(finalPosts)<- "UTF-8"
 
 write(finalPosts,file="UAEtripAdvisor.txt",sep="\n")
 
 
-############################## Done! 1246 Posts included in our dataset! #####################################
+############################## Done! 1578 Posts included in our dataset! #####################################
