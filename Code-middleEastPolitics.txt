@@ -49,7 +49,7 @@ postsClean<- gsub("\\s*Originally\\sPosted\\sby\\s[[:alnum:]]*(\\s|[[:punct:]])"
 #remove numbers
 postsClean<- gsub("[[:digit:]]+"," ",postsClean)
 #change letters to lowercase
-postsClean<- tolower(postsClean)
+postsClean<- sapply(postsClean,function(x)tolower(x))
 #remove any quotes
 postsClean<- gsub("\""," ",postsClean)
 #remove numbers
