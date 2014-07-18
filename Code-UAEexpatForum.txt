@@ -15,7 +15,7 @@ require(tm)
 
 
 baseUrl<- "http://www.expatforum.com/expats/uae-expat-forum-expats-living-uae/"
-completeUrl<- paste0(baseUrl,"index",seq(from=1,to=10),".html")
+completeUrl<- paste0(baseUrl,"index",seq(from=1,to=15),".html")
 
 
 
