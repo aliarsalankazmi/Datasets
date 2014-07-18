@@ -85,4 +85,4 @@ Encoding(finalPosts)<- "UTF-8"
 write(finalPosts,file="UAEtripAdvisor.txt",sep="\n")
 
 
-############################## Done! 1573 Posts included in our dataset! #####################################
+############################## Done! 1574 Posts included in our dataset! #####################################
