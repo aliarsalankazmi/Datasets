@@ -108,4 +108,4 @@ Encoding(finalPosts)<- "UTF-8"
 write(finalPosts,file="middleEastPolitics.txt",sep="\n")
 
 
-############################## Done! 2230 Posts included in our dataset! #####################################
+############################## Done! 1377 Posts included in our dataset! #####################################
