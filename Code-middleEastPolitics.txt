@@ -102,6 +102,8 @@ postsClean<- gsub("\\s$","",postsClean)
 #remove posts with low information value
 finalPosts<- postsClean[sapply(postsClean,function(x)nchar(x))>10]
 
+#Change encoding to allow reading into shinyapp
+Encoding(finalPosts)<- "UTF-8"
 
 write(finalPosts,file="middleEastPolitics.txt",sep="\n")
 
