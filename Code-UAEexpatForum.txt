@@ -80,8 +80,11 @@ postsClean<- gsub("\\s$","",postsClean)
 #remove posts with low information value
 finalPosts<- postsClean[sapply(postsClean,function(x)nchar(x))>10]
 
+#Change encoding to UTF-8 to allow reading into shinyapp
+Encoding(finalPosts)<- "UTF-8"
+
 write(finalPosts,file="UAEexpatForum.txt",sep="\n")
 
 
 
-############################## Done! 1516 Posts included in our dataset! #####################################
+############################## Done! 1542 Posts included in our dataset! #####################################
