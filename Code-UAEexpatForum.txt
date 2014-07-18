@@ -52,7 +52,7 @@ postsClean<- removeNumbers(postsClean)
 postsClean<- tolower(postsClean)
 
 #remove strange characters
-#postsClean<- gsub("[[:alnum:]]","",postsClean)
+#postsClean<- gsub("[^a-zA-Z0-9]","",postsClean)
 
 #now, we may remove any stopwords present in the dataset
 myStopwords<- c(stopwords("english"),stopwords("SMART"),"uae","edited","posted","salam","salaam","salaams","wasalam","bro","reply","january","february","march","april","may","june","july","august","september","october","november","december","jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","pm","am","ae","topic","topics","tonnes","tons","things","thing","quote","quoted","people","non","none","guyz","forums","forum","folk","folks","days","day","comments","comment","thanks","thank","ve")
