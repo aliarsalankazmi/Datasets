@@ -49,10 +49,10 @@ postsClean<- gsub("[[:graph:]]+\\.(com|co|ae|org|gov)[[:graph:]]*[.htm]*"," ",po
 postsClean<- gsub("[[:graph:]]+@[[:graph:]]+\\.(com|co|ae|org|gov)"," ",postsClean)
 #remove numbers
 postsClean<- gsub("[[:digit:]]"," ",postsClean)
-#change letters to lowercase
-postsClean<- sapply(postsClean,function(x)tolower(x))
 #remove characters that are not alpha-numeric
 postsClean<- gsub("[^a-zA-Z0-9]"," ",postsClean)
+#change letters to lowercase
+postsClean<- sapply(postsClean,function(x)tolower(x))
 
 #remove stopwords
 myStopwords<- c(stopwords("english"),stopwords("SMART"),"just","am","pm","about","around","out","tripadvisor","thanks","thank you","need","very","only","could","other","going","more","emirates","post","think","days","should","area","city","posting","anyone","thank","hour","hours","most","were","room","because","remove","right","last","hi","both","please","next","info","better","travel","make","few","nice","staying","too","does","same","trip","being","per","minutes","minute","over","always","here","say","between","close","even","forum","now","posts","still","again","edited","edit","year","its","end","got","above","stayed","getting","off","did","link","either","links","times","able","during","having","message","that's","lots","never","th","anything","ask","review","reviews","something","another","each","give","board","different","things","thing","those","can't","etc","here","add","anybody","ibn","perhaps","reply","comment","comments","cheers","dhs","aed","answer","answers","it's")
