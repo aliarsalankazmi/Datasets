@@ -48,15 +48,14 @@ postsClean<- gsub("www\\.[[:graph:]]+\\s"," ",postsClean)
 postsClean<- gsub("\\s*Originally\\sPosted\\sby\\s[[:alnum:]]*(\\s|[[:punct:]])"," ",postsClean)
 #remove numbers
 postsClean<- gsub("[[:digit:]]+"," ",postsClean)
+#remove unnecessary characters
+postsClean<- gsub("[^a-zA-Z0-9]"," ",postsClean)
 #change letters to lowercase
 postsClean<- sapply(postsClean,function(x)tolower(x))
 #remove any quotes
 postsClean<- gsub("\""," ",postsClean)
 #remove numbers
 postsClean<- gsub("[[:digit:]]","",postsClean)
-
-#remove unnecessary characters
-postsClean<- gsub("[^a-zA-Z0-9]"," ",postsClean)
 
 #remove unnecessary punctuation
 #postsClean<- gsub("[.,;:?!/)(]"," ",postsClean)
