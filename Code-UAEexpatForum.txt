@@ -45,6 +45,8 @@ discussionContents<- unlist(lapply(discussion,function(x)getNodeSet(x,"//div[sta
 posts<- unlist(lapply(discussionContents,function(x)xmlValue(x)))
 #remove unnecessary parts of a post
 postsClean<- gsub("\r|\n|\t"," ",posts)
+#remove tags
+postsClean<- gsub("<[[:alnum:]|[:punct:]]*>"," ",postsClean)
 postsClean<- gsub("Originally Posted by ","OriginallyPostedBy",postsClean)
 #postsClean<- gsub("Originally.*?\\b"," ",postsClean)
 postsClean<- gsub("Originally[[:alnum:]]*\\b"," ",postsClean)
