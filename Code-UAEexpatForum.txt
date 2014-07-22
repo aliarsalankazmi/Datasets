@@ -89,4 +89,4 @@ write(finalPosts,file="UAEexpatForum.txt",sep="\n")
 
 
 
-############################## Done! 1542 Posts included in our dataset! #####################################
+############################## Done! 1592 Posts included in our dataset! #####################################
