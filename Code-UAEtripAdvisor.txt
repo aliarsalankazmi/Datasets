@@ -47,6 +47,8 @@ posts<- gsub("\t|\n|\r"," ",posts)
 postsClean<- gsub("[[:graph:]]+\\.(com|co|ae|org|gov)[[:graph:]]*[.htm]*"," ",posts)
 #remove email addresses
 postsClean<- gsub("[[:graph:]]+@[[:graph:]]+\\.(com|co|ae|org|gov)"," ",postsClean)
+#remove tags
+postsClean<- gsub("<[[:alnum:]|[:punct:]]*>"," ",postsClean)
 #remove numbers
 postsClean<- gsub("[[:digit:]]"," ",postsClean)
 #remove characters that are not alpha-numeric
